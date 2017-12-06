@@ -19,83 +19,29 @@ public class DoublyLinkedList {
             this.value = null;
             this.index = index;
         }
-
-
     }
 
     /**
      * creates new element at beginning of list
      * links it to the second
      */
-    public void addFirst(String value) {
-        add(1, value);
-    }
-
-    /**
-     * inserts object of element at end of list
-     */
-    public void addLast(String value) {
-        if(size != 0){
-            add(this.firstElement.prev.index + 1, value);
-        }else{
-            addFirst(value);
-            System.out.println("For list was empty, element has been inserted as first element.");
-        }
-
-    }
-
-    /**
-     * Inserts element at place of given index into list.
-     */
-    public void add(int index, String value) {
-        int realIndex;
-        if (index < 1) {
-            realIndex = 1;
-        } else {
-            realIndex = index;
-        }
-        Element newElement = new Element(null, null, value, realIndex);
-        // if list is empty
-        if (this.size == 0) {
+    public void addFirst(String value){
+        Element newElement = new Element(null, null, value, 1);
+        Element prevElement = null;
+        Element postElement = null;
+        if(isEmpty()) {
             this.firstElement = newElement;
             newElement.prev = this.firstElement;
             newElement.post = this.firstElement;
             this.size++;
-            return;
+        }else if (size == 1 || size < this.firstElement.index) {
+                prevElement = this.firstElement.post;
+                postElement = this.firstElement;
+                this.firstElement = newElement;
         }
-
-        Element prevElement = null;
-        Element postElement = null;
-        // addFirst if list is not empty
-        if (realIndex == 1 || realIndex < this.firstElement.index) {
-            prevElement = this.firstElement.post;
-            postElement = this.firstElement;
-            this.firstElement = newElement;
-            //insert element at end of list
-        } else if (realIndex > this.firstElement.post.index) {
-            prevElement = this.firstElement.post;
-            postElement = this.firstElement;
-        } else {
-            // insert with index
-            Element momElement = this.firstElement;
-            // seek place to insert
-            do {
-                if (momElement.index == realIndex) {
-                    System.out.println("Error: Index" + (realIndex) + " is already in use.");
-                    return;
-                }
-                momElement = momElement.post;
-            } while (momElement.index < realIndex);
-            prevElement = momElement.prev;
-            postElement = momElement;
-        }
-        // link the new element in and set pointer
-        prevElement.post = newElement;
-        postElement.prev = newElement;
-        newElement.prev = prevElement;
-        newElement.post = postElement;
         // only if addFirst
-        if (realIndex == 1) {
+        //TODO do I realy need this??
+        if (size == 1) {
             int momIndex = 1;
             Element momElement = this.firstElement.post;
             //increase index until gap
@@ -105,8 +51,58 @@ public class DoublyLinkedList {
                 momElement = momElement.post;
             }
         }
-        this.size++;
-        return;
+    }
+
+    /**
+     * inserts object of element at end of list
+     */
+    public void addLast(String value) {
+        Element newElement = new Element(null, null, value, this.firstElement.prev.index + 1);
+        Element prevElement = null;
+        Element postElement = null;
+        if(size != 0){
+            if (size > this.firstElement.post.index) {
+                prevElement = this.firstElement.post;
+                postElement = this.firstElement;
+            }
+        }else{
+            addFirst(value);
+            System.out.println("For list was empty, element has been inserted as first element.");
+        }
+
+    }
+
+    /**
+     * Inserts element at place of given index into list.
+     *
+     */
+    public void add(int index, String value) {
+        Element newElement = new Element(null, null, value, this.firstElement.prev.index + 1);
+        Element prevElement = null;
+        Element postElement = null;
+        Element lastElement = firstElement.prev;
+        if (index < 1) {
+            System.out.println("Index was set to 1. Indices start with 1");
+            index = 1;
+        }
+        if (isEmpty() || index == 1) {
+           addFirst(value);
+        }else if(index > lastElement.index){
+            addLast(value);
+        }else{
+            Element currentElement = this.firstElement;
+            while(currentElement.index <= lastElement.index){
+                if(currentElement.index == index) {
+                    System.out.println("Index already in use.");
+                    return;
+                }else if(currentElement.index > index){
+                    newElement.index = index;
+                    currentElement.prev.prev = newElement.prev;
+                    currentElement = newElement.post;
+                }
+            }
+        }
+        size++;
     }
 
     /**
